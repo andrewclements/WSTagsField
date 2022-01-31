@@ -409,14 +409,22 @@ open class WSTagsField: UIScrollView {
         }
 
         tagView.onDidRequestDelete = { [weak self] tagView, replacementText in
-            // First, refocus the text field
-            self?.textField.becomeFirstResponder()
+            guard let safeSelf = self else { return }
+            let index = safeSelf.tagViews.firstIndex(of: tagView)
+            if index == safeSelf.tagViews.count - 1 {
+                // First, refocus the text field
+                safeSelf.textField.becomeFirstResponder()
+            } else if safeSelf.tagViews.count == 2 {
+                safeSelf.selectNextTag()
+            } else {
+                safeSelf.selectPrevTag()
+            }
             if (replacementText?.isEmpty ?? false) == false {
-                self?.textField.text = replacementText
+                safeSelf.textField.text = replacementText
             }
             // Then remove the view from our data
-            if let index = self?.tagViews.firstIndex(of: tagView) {
-                self?.removeTagAtIndex(index)
+            if let index = index {
+                safeSelf.removeTagAtIndex(index)
             }
         }
 
